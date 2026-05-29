@@ -1,1 +1,155 @@
+package main
 
+import "fmt"
+
+type dataTim struct {
+	namaTim    string
+	cabangGame string
+	poin       int
+}
+
+type tabTim [1000]dataTim
+
+var timArray tabTim
+var jumlahTim int = 0
+
+func main() {
+	menu()
+}
+
+func menu() {
+	var userInput int
+	var exit = false
+
+	for !exit {
+		fmt.Println("\n=== E-SPORTS TOURNAMENT SYSTEM ===")
+		fmt.Println("1. Input Data Tim")
+		fmt.Println("2. Edit Data Tim")
+		fmt.Println("3. Hapus Data Tim")
+		fmt.Println("4. Tampilkan Klasemen")
+		fmt.Println("0. Exit")
+		fmt.Print("Pilih menu: ")
+		fmt.Scan(&userInput)
+
+		switch userInput {
+		case 1:
+			inputDataTim()
+		case 2:
+			editDataTim()
+		case 3:
+			hapusDataTim()
+		case 4:
+			tampilkanKlasemen()
+		case 0:
+			exit = true
+		default:
+			fmt.Println("Pilihan tidak valid. Mohon masukkan pilihan yang valid!")
+		}
+	}
+}
+
+func inputDataTim() {
+	if jumlahTim >= 1000 {
+		fmt.Println("Kapasitas turnamen penuh!")
+		return
+	}
+
+	var t dataTim
+	fmt.Print("Masukkan Nama Tim: ")
+	fmt.Scan(&t.namaTim)
+	fmt.Print("Masukkan Cabang Game: ")
+	fmt.Scan(&t.cabangGame)
+	fmt.Print("Masukkan Poin Awal: ")
+	fmt.Scan(&t.poin)
+
+	timArray[jumlahTim] = t
+	jumlahTim++
+
+	fmt.Println("✅ Tim berhasil ditambahkan!")
+}
+
+func editDataTim() {
+	if jumlahTim == 0 {
+		fmt.Println("Belum ada data tim yang terdaftar.")
+		return
+	}
+
+	var namaDicari string
+	fmt.Print("Masukkan Nama Tim yang ingin diubah: ")
+	fmt.Scan(&namaDicari)
+
+	found := false
+	i := 0
+	for !found && i < jumlahTim {
+		if timArray[i].namaTim == namaDicari {
+			found = true
+			fmt.Print("Masukkan Nama Tim Baru: ")
+			fmt.Scan(&timArray[i].namaTim)
+			fmt.Print("Masukkan Cabang Game Baru: ")
+			fmt.Scan(&timArray[i].cabangGame)
+			fmt.Print("Masukkan Poin Baru: ")
+			fmt.Scan(&timArray[i].poin)
+			fmt.Println("Data tim berhasil diperbarui!")
+		}
+		i++
+	}
+
+	if !found {
+		fmt.Println("Tim tidak ditemukan.")
+	}
+}
+
+func hapusDataTim() {
+	if jumlahTim == 0 {
+		fmt.Println("Belum ada data tim yang terdaftar.")
+		return
+	}
+
+	var namaDicari string
+	fmt.Print("Masukkan Nama Tim yang ingin dihapus: ")
+	fmt.Scan(&namaDicari)
+
+	found := false
+	i := 0
+	for !found && i < jumlahTim {
+		if timArray[i].namaTim == namaDicari {
+			found = true
+			for j := i; j < jumlahTim-1; j++ {
+				timArray[j] = timArray[j+1]
+			}
+			jumlahTim--
+			fmt.Println("Data tim berhasil dihapus.")
+		}
+		i++
+	}
+
+	if !found {
+		fmt.Println("Tim tidak ditemukan.")
+	}
+}
+
+func tampilkanKlasemen() {
+	if jumlahTim == 0 {
+		fmt.Println("\n--- KLASEMEN SAAT INI ---")
+		fmt.Println("Belum ada data tim.")
+		return
+	}
+
+	for i := 0; i < jumlahTim-1; i++ {
+		maxIdx := i
+		for j := i + 1; j < jumlahTim; j++ {
+			if timArray[j].poin > timArray[maxIdx].poin {
+				maxIdx = j
+			}
+		}
+		timArray[i], timArray[maxIdx] = timArray[maxIdx], timArray[i]
+	}
+
+	fmt.Println("\n--- KLASEMEN SAAT INI ---")
+	fmt.Printf("%-3s | %-20s | %-15s | %-4s\n", "No", "Nama Tim", "Game", "Poin")
+	fmt.Println("---------------------------------------------------------")
+	
+	for i := 0; i < jumlahTim; i++ {
+		fmt.Printf("%-3d | %-20s | %-15s | %-4d\n", i+1, timArray[i].namaTim, timArray[i].cabangGame, timArray[i].poin)
+	}
+}
